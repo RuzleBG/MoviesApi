@@ -3,11 +3,10 @@ package com.soosy.demo.Service;
 import java.util.List;
 import java.util.Set;
 
-import org.springframework.http.HttpStatus;
-
 import com.soosy.demo.Entities.Actor;
-import com.soosy.demo.Entities.Movie;
 import com.soosy.demo.Exceptions.ActorNotFoundException;
+
+import jakarta.validation.Valid;
 
 public interface ActorService {
 
@@ -24,5 +23,7 @@ public interface ActorService {
     Actor findActorByName(String actorName) throws ActorNotFoundException;
 
     Set<String> getAllMoviesByAnActor(long actorId) throws ActorNotFoundException;
+
+    Actor updateActor(@Valid Actor actor, long actorId);
     
 }

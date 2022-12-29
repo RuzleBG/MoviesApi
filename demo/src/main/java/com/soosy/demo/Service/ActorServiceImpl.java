@@ -3,10 +3,8 @@ package com.soosy.demo.Service;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
-import org.aspectj.weaver.patterns.ThisOrTargetAnnotationPointcut;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -15,6 +13,8 @@ import com.soosy.demo.Entities.Movie;
 import com.soosy.demo.Exceptions.ActorNotFoundException;
 import com.soosy.demo.Exceptions.MovieNotFoundException;
 import com.soosy.demo.Repository.ActorRepository;
+
+import jakarta.validation.Valid;
 
 @Service
 public class ActorServiceImpl implements ActorService {
@@ -36,7 +36,9 @@ public class ActorServiceImpl implements ActorService {
     @Override
     public void addMovieToActor(long actorId, long movieId) throws ActorNotFoundException, MovieNotFoundException {
         Actor actor=actorRepository.findById(actorId).orElseThrow(()->new ActorNotFoundException("Actor not found"));
-        actor.getMovies().add(movieSerivce.findMovieById(movieId));
+        Movie movie=movieSerivce.findMovieById(movieId);
+        actor.getMovies().add(movie);
+        movie.getActors().add(actor);
         actorRepository.save(actor);
     }
     @Override
@@ -48,8 +50,8 @@ public class ActorServiceImpl implements ActorService {
         
     }
     @Override
-    public Actor findActorById(long actor_id) throws ActorNotFoundException {
-        return actorRepository.findById(actor_id).orElseThrow(()->new ActorNotFoundException("Actor not found"));
+    public Actor findActorById(long actorId) throws ActorNotFoundException {
+        return actorRepository.findById(actorId).orElseThrow(()->new ActorNotFoundException("Actor not found"));
     }
     @Override
     public Actor findActorByName(String actorName) throws ActorNotFoundException {
@@ -63,5 +65,11 @@ public class ActorServiceImpl implements ActorService {
         }
         return actor.get().getMovies().stream().map(x->x.getTitle()).collect(Collectors.toSet());
 
+    }
+    @Override
+    public Actor updateActor(@Valid Actor actor, long actorId) {
+        actor.setId(actorId);
+        actor.setMovies(findActorById(actorId).getMovies());
+        return actorRepository.save(actor);
     }   
 }

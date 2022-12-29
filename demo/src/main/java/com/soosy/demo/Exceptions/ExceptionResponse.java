@@ -1,6 +1,5 @@
 package com.soosy.demo.Exceptions;
 
-import java.sql.Date;
 import java.time.LocalDate;
 
 import org.springframework.http.HttpStatus;
