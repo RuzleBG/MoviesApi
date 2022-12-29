@@ -2,9 +2,11 @@ package com.soosy.demo.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
+import org.aspectj.weaver.patterns.ThisOrTargetAnnotationPointcut;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -52,5 +54,14 @@ public class ActorServiceImpl implements ActorService {
     @Override
     public Actor findActorByName(String actorName) throws ActorNotFoundException {
         return actorRepository.findByName(actorName).orElseThrow(()->new ActorNotFoundException("Actor with name: " + actorName+ " cannot be found"));
+    }
+    @Override
+    public Set<String> getAllMoviesByAnActor(long actorId) throws ActorNotFoundException {
+        Optional<Actor> actor= actorRepository.findById(actorId);
+        if(!actor.isPresent()){
+            throw new ActorNotFoundException("Actor with id: " + actorId + " cannot be found");
+        }
+        return actor.get().getMovies().stream().map(x->x.getTitle()).collect(Collectors.toSet());
+
     }   
 }

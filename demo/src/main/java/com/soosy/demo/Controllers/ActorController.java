@@ -1,6 +1,7 @@
 package com.soosy.demo.Controllers;
 
 import java.util.List;
+import java.util.Set;
 
 import org.apache.catalina.connector.Response;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.soosy.demo.Entities.Actor;
+import com.soosy.demo.Entities.Movie;
 import com.soosy.demo.Exceptions.ActorNotFoundException;
 import com.soosy.demo.Exceptions.MovieNotFoundException;
 import com.soosy.demo.Service.ActorService;
@@ -55,5 +57,9 @@ public class ActorController {
     @GetMapping("/actors/name")
     public ResponseEntity<Actor> findActorByName(@RequestParam(value = "actor_name") String actorName) throws ActorNotFoundException{
         return new ResponseEntity<Actor>(actorService.findActorByName(actorName), HttpStatus.OK);
+    }
+    @GetMapping("/actors/listofmovies")
+    public ResponseEntity<Set<String>> getAllMoviesByAnActor(@RequestParam(value="actor_id") long actorId) throws ActorNotFoundException{
+        return new ResponseEntity<Set<String>>(actorService.getAllMoviesByAnActor(actorId), HttpStatus.OK);
     }
 }
