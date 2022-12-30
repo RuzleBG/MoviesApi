@@ -1,11 +1,8 @@
 package com.soosy.demo.Controllers;
 
 import java.util.List;
-import java.util.Set;
 
-import org.apache.tomcat.util.http.fileupload.InvalidFileNameException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -20,13 +17,12 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.soosy.demo.Entities.Actor;
 import com.soosy.demo.Exceptions.ActorNotFoundException;
+import com.soosy.demo.Exceptions.FieldNotFoundException;
 import com.soosy.demo.Exceptions.MovieNotFoundException;
 import com.soosy.demo.Service.ActorService;
 
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.Null;
-import jakarta.websocket.server.PathParam;
 
 @RestController
 @RequestMapping("/actors")
@@ -37,7 +33,7 @@ public class ActorController {
 
     @GetMapping("/{page}/{size}/{field}")
     public ResponseEntity<List<Actor>> getAllActors(@PathVariable(value = "page") int page, 
-        @PathVariable(value = "size") int size, @PathVariable(value = "field") String field) throws RuntimeException{
+        @PathVariable(value = "size") int size, @PathVariable(value = "field") String field) throws FieldNotFoundException{
         return new ResponseEntity<List<Actor>>(actorService.getAllActors(page,size,field).getContent(), HttpStatus.OK);
     }
     @PostMapping()

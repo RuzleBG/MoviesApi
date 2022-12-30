@@ -2,9 +2,6 @@ package com.soosy.demo.Repository;
 
 import java.util.Optional;
 
-import javax.print.attribute.standard.PageRanges;
-
-import org.springframework.boot.autoconfigure.data.web.SpringDataWebProperties.Pageable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.repository.JpaRepository;

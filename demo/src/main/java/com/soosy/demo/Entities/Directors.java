@@ -2,8 +2,6 @@ package com.soosy.demo.Entities;
 
 import java.util.Set;
 
-import org.springframework.context.annotation.Primary;
-
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;

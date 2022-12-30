@@ -1,14 +1,20 @@
 package com.soosy.demo.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import com.soosy.demo.Entities.Actor;
 import com.soosy.demo.Entities.Movie;
+import com.soosy.demo.Exceptions.FieldNotFoundException;
 import com.soosy.demo.Exceptions.MovieNotFoundException;
 import com.soosy.demo.Repository.MovieRepository;
 
@@ -21,8 +27,12 @@ public class MovieServiceImpl implements MovieSerivce{
     MovieRepository movieRepository;
     
     @Override
-    public List<Movie> getAllMovies() {
-        return movieRepository.findAll();
+    public Page<Movie> getAllMovies(int page, int size, String field) throws FieldNotFoundException {
+        try {
+            return movieRepository.findAll(PageRequest.of(page, size, Sort.Direction.ASC, field));
+        } catch (Exception e) {
+            throw new FieldNotFoundException("Invalid Field");
+        }
     }
     @Override
     public Movie SaveMovie(@Valid Movie movie) {
@@ -41,12 +51,18 @@ public class MovieServiceImpl implements MovieSerivce{
         
     }
     @Override
-    public Movie findMovieByTitle(String title) throws MovieNotFoundException {
-        return movieRepository.findByTitle(title).orElseThrow(()->new MovieNotFoundException("Movie with title: " + title + " does not exist"));
+    public Page<Movie> findMovieByTitle(int page, int size, String title) throws MovieNotFoundException {
+        Optional<Page<Movie>> movies= movieRepository.findByTitleContaining(title, PageRequest.of(page, size, Sort.Direction.ASC, "title"));
+        if(movies.get().isEmpty()){
+            throw new MovieNotFoundException("Movie titles containing: " + title + " do not exist");
+        }
+        return movies.get();
+
     }
     @Override
-    public Set<String> getActors(long id) throws MovieNotFoundException {
-        return findMovieById(id).getActors().stream().map(x->x.getName()).collect(Collectors.toSet());
+    public Page<String> getActors(int page, int size,   long id) throws MovieNotFoundException {
+        List<String> actors=findMovieById(id).getActors().stream().map(x->x.getName()).collect(Collectors.toList());
+        return new PageImpl<String>(actors, PageRequest.of(page, size), actors.size());
     }
     @Override
     public Movie updateMovie(@Valid Movie movie, long id) throws MovieNotFoundException {
