@@ -34,7 +34,7 @@ public class MovieController {
 
     @GetMapping("/{page}/{size}")
     public ResponseEntity<List<Movie>> getAllMovies(@PathVariable(value = "page") int page, @PathVariable(value = "size") int size,
-        @RequestParam(value = "field") String field) throws FieldNotFoundException{
+        @RequestParam(value = "field", defaultValue = "id") String field) throws FieldNotFoundException{
         return new ResponseEntity<List<Movie>>(movieSerivce.getAllMovies(page,size,field).getContent(), HttpStatus.OK); 
     }
     @GetMapping("/id")

@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 import com.soosy.demo.Exceptions.ActorNotFoundException;
+import com.soosy.demo.Exceptions.DirectorNotFoundException;
 import com.soosy.demo.Exceptions.ExceptionResponse;
 import com.soosy.demo.Exceptions.FieldNotFoundException;
 import com.soosy.demo.Exceptions.MovieNotFoundException;
@@ -31,7 +32,14 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler{
                 HttpStatus.BAD_GATEWAY);
     }
     @ExceptionHandler(FieldNotFoundException.class)
-    public ResponseEntity<ExceptionResponse> FieldNotFoundException(FieldNotFoundException ex){
+    public ResponseEntity<ExceptionResponse> FieldNotFoundExceptionResponse(FieldNotFoundException ex){
+        return new ResponseEntity<ExceptionResponse>(
+            new ExceptionResponse(
+                ex.getMessage(), HttpStatus.BAD_REQUEST, LocalDate.now()), 
+                HttpStatus.BAD_GATEWAY);
+    }
+    @ExceptionHandler(DirectorNotFoundException.class)
+    public ResponseEntity<ExceptionResponse> DirectorNotFoundExceptionResponse(DirectorNotFoundException ex){
         return new ResponseEntity<ExceptionResponse>(
             new ExceptionResponse(
                 ex.getMessage(), HttpStatus.BAD_REQUEST, LocalDate.now()), 
