@@ -3,11 +3,14 @@ package com.soosy.demo.Controllers;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.tomcat.util.http.fileupload.InvalidFileNameException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -22,6 +25,8 @@ import com.soosy.demo.Service.ActorService;
 
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Null;
+import jakarta.websocket.server.PathParam;
 
 @RestController
 @RequestMapping("/actors")
@@ -30,9 +35,10 @@ public class ActorController {
     @Autowired
     ActorService actorService;
 
-    @GetMapping()
-    public ResponseEntity<List<Actor>> getAllActors(){
-        return new ResponseEntity<List<Actor>>(actorService.getAllActors(), HttpStatus.OK);
+    @GetMapping("/{page}/{size}/{field}")
+    public ResponseEntity<List<Actor>> getAllActors(@PathVariable(value = "page") int page, 
+        @PathVariable(value = "size") int size, @PathVariable(value = "field") String field) throws RuntimeException{
+        return new ResponseEntity<List<Actor>>(actorService.getAllActors(page,size,field).getContent(), HttpStatus.OK);
     }
     @PostMapping()
     public ResponseEntity<Actor> addNewActor(@Valid @RequestBody Actor actor){
@@ -53,13 +59,15 @@ public class ActorController {
         actorService.deleteActor(actorId);
         return new ResponseEntity<HttpStatus>(HttpStatus.OK);
     }
-    @GetMapping("/name")
-    public ResponseEntity<Actor> findActorByName(@RequestParam(value = "actor_name") String actorName) throws ActorNotFoundException{
-        return new ResponseEntity<Actor>(actorService.findActorByName(actorName), HttpStatus.OK);
+    @GetMapping("/name/{page}/{size}")
+    public ResponseEntity<List<Actor>> findActorByName(@RequestParam(value = "actor_name") String actorName,
+        @PathVariable(value = "page") int page, @PathVariable(value = "size") int size) throws ActorNotFoundException{
+        return new ResponseEntity<List<Actor>>(actorService.findActorByName(actorName, page, size).getContent(), HttpStatus.OK);
     }
-    @GetMapping("/listofmovies")
-    public ResponseEntity<Set<String>> getAllMoviesByAnActor(@RequestParam(value="actor_id") long actorId) throws ActorNotFoundException{
-        return new ResponseEntity<Set<String>>(actorService.getAllMoviesByAnActor(actorId), HttpStatus.OK);
+    @GetMapping("/listofmovies/{page}/{size}")
+    public ResponseEntity<List<String>> getAllMoviesByAnActor(@RequestParam(value="actor_id") long actorId, 
+        @PathVariable(value = "page") int page, @PathVariable(value = "size") int size) throws ActorNotFoundException{
+        return new ResponseEntity<List<String>>(actorService.getAllMoviesByAnActor(actorId,page,size).getContent(), HttpStatus.OK);
     }
     @Transactional
     @PutMapping("/update")

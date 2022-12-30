@@ -10,6 +10,7 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 
 import com.soosy.demo.Exceptions.ActorNotFoundException;
 import com.soosy.demo.Exceptions.ExceptionResponse;
+import com.soosy.demo.Exceptions.FieldNotFoundException;
 import com.soosy.demo.Exceptions.MovieNotFoundException;
 
 @ControllerAdvice
@@ -24,6 +25,13 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler{
     }
     @ExceptionHandler(MovieNotFoundException.class)
     public ResponseEntity<ExceptionResponse> MovieNotFoundResponse(MovieNotFoundException ex){
+        return new ResponseEntity<ExceptionResponse>(
+            new ExceptionResponse(
+                ex.getMessage(), HttpStatus.BAD_REQUEST, LocalDate.now()), 
+                HttpStatus.BAD_GATEWAY);
+    }
+    @ExceptionHandler(FieldNotFoundException.class)
+    public ResponseEntity<ExceptionResponse> FieldNotFoundException(FieldNotFoundException ex){
         return new ResponseEntity<ExceptionResponse>(
             new ExceptionResponse(
                 ex.getMessage(), HttpStatus.BAD_REQUEST, LocalDate.now()), 

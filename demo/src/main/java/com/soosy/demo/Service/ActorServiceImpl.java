@@ -1,16 +1,24 @@
 package com.soosy.demo.Service;
 
+import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.apache.tomcat.util.http.fileupload.InvalidFileNameException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.data.web.SpringDataWebProperties.Pageable;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import com.soosy.demo.Entities.Actor;
 import com.soosy.demo.Entities.Movie;
 import com.soosy.demo.Exceptions.ActorNotFoundException;
+import com.soosy.demo.Exceptions.FieldNotFoundException;
 import com.soosy.demo.Exceptions.MovieNotFoundException;
 import com.soosy.demo.Repository.ActorRepository;
 
@@ -26,8 +34,12 @@ public class ActorServiceImpl implements ActorService {
     MovieSerivce movieSerivce;
 
     @Override
-    public List<Actor> getAllActors() {
-        return actorRepository.findAll();
+    public Page<Actor> getAllActors(int page, int size, String field) throws InvalidFileNameException {
+        try {
+            return actorRepository.findAll(PageRequest.of(page, size, Sort.Direction.ASC, field));
+        } catch (Exception e) {
+            throw new FieldNotFoundException("Invalid Field Name");
+        }
     }
     @Override
     public Actor addNewActor(Actor actor) {
@@ -35,7 +47,7 @@ public class ActorServiceImpl implements ActorService {
     }
     @Override
     public void addMovieToActor(long actorId, long movieId) throws ActorNotFoundException, MovieNotFoundException {
-        Actor actor=actorRepository.findById(actorId).orElseThrow(()->new ActorNotFoundException("Actor not found"));
+        Actor actor=findActorById(actorId);
         Movie movie=movieSerivce.findMovieById(movieId);
         actor.getMovies().add(movie);
         movie.getActors().add(actor);
@@ -54,16 +66,21 @@ public class ActorServiceImpl implements ActorService {
         return actorRepository.findById(actorId).orElseThrow(()->new ActorNotFoundException("Actor not found"));
     }
     @Override
-    public Actor findActorByName(String actorName) throws ActorNotFoundException {
-        return actorRepository.findByName(actorName).orElseThrow(()->new ActorNotFoundException("Actor with name: " + actorName+ " cannot be found"));
+    public Page<Actor> findActorByName(String actorName, int page, int size) throws ActorNotFoundException {
+        Optional<Page<Actor>> actors=actorRepository.findByNameContaining(actorName, PageRequest.of(page, size, Sort.Direction.ASC, "name"));
+        if(actors.get().isEmpty()){
+            throw new ActorNotFoundException("Actor with name: " + actorName+ " cannot be found");
+        }
+        return actors.get();
     }
     @Override
-    public Set<String> getAllMoviesByAnActor(long actorId) throws ActorNotFoundException {
+    public Page<String> getAllMoviesByAnActor(long actorId, int page, int size) throws ActorNotFoundException {
         Optional<Actor> actor= actorRepository.findById(actorId);
         if(!actor.isPresent()){
             throw new ActorNotFoundException("Actor with id: " + actorId + " cannot be found");
         }
-        return actor.get().getMovies().stream().map(x->x.getTitle()).collect(Collectors.toSet());
+        List<String> movies=actor.get().getMovies().stream().map(x->x.getTitle()).collect(Collectors.toList());
+        return new PageImpl<String>(movies,PageRequest.of(page, size),movies.size());
 
     }
     @Override
