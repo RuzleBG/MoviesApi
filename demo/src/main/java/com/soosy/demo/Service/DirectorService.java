@@ -1,6 +1,9 @@
 package com.soosy.demo.Service;
 
+import java.util.List;
+
 import org.springframework.data.domain.Page;
+import org.springframework.http.HttpStatus;
 
 import com.soosy.demo.Entities.Director;
 import com.soosy.demo.Exceptions.DirectorNotFoundException;
@@ -15,5 +18,9 @@ public interface DirectorService {
     Director getDirectorById(long id) throws DirectorNotFoundException;
 
     Director saveDirector(@Valid Director director);
+
+    void assignDirector(long directorId, long movieId);
+
+    Page<String> getMoviesFromDirector(long directorId, int page, int size) throws DirectorNotFoundException;
     
 }

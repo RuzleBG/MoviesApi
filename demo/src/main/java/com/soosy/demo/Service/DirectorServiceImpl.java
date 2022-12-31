@@ -1,15 +1,22 @@
 package com.soosy.demo.Service;
 
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import com.soosy.demo.Entities.Director;
+import com.soosy.demo.Entities.Movie;
 import com.soosy.demo.Exceptions.DirectorNotFoundException;
 import com.soosy.demo.Exceptions.FieldNotFoundException;
+import com.soosy.demo.Exceptions.MovieNotFoundException;
 import com.soosy.demo.Repository.DirectorRepository;
 
 import jakarta.validation.Valid;
@@ -19,6 +26,9 @@ public class DirectorServiceImpl implements DirectorService {
 
     @Autowired
     DirectorRepository directorRepository;
+
+    @Autowired
+    MovieSerivce movieSerivce;
 
     @Override
     public Page<Director> getAllDirectors(int page, int size, String field) throws FieldNotFoundException {
@@ -37,6 +47,20 @@ public class DirectorServiceImpl implements DirectorService {
     @Override
     public Director saveDirector(@Valid Director director) {
         return directorRepository.save(director);
+    }
+
+    @Override
+    public void assignDirector(long directorId, long movieId) throws DirectorNotFoundException, MovieNotFoundException {
+        Director director=getDirectorById(directorId);
+        Movie movie=movieSerivce.findMovieById(movieId);
+        movie.setDirector(director);
+        movieSerivce.SaveMovie(movie);
+    }
+
+    @Override
+    public Page<String> getMoviesFromDirector(long directorId, int page, int size) throws DirectorNotFoundException {
+        List<String> movieTitles= getDirectorById(directorId).getMovies().stream().map(x->x.getTitle()).collect(Collectors.toList());
+        return new PageImpl(movieTitles, PageRequest.of(page,size), movieTitles.size());
     }
 
     
