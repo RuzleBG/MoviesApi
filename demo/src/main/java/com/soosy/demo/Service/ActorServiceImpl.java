@@ -20,8 +20,12 @@ import com.soosy.demo.Exceptions.MovieNotFoundException;
 import com.soosy.demo.Repository.ActorRepository;
 
 import jakarta.validation.Valid;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 
 @Service
+@NoArgsConstructor
 public class ActorServiceImpl implements ActorService {
 
     @Autowired
@@ -30,8 +34,16 @@ public class ActorServiceImpl implements ActorService {
     @Autowired
     MovieSerivce movieSerivce;
 
+    //used for testing purposes
+    public ActorServiceImpl(ActorRepository actorRepository){
+        this.actorRepository=actorRepository;
+    }
+
     @Override
     public Page<Actor> getAllActors(int page, int size, String field) throws InvalidFileNameException {
+        if(field==null){
+            field="id";
+        }
         try {
             return actorRepository.findAll(PageRequest.of(page, size, Sort.Direction.ASC, field));
         } catch (Exception e) {

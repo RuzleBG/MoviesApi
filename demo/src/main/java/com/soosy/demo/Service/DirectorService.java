@@ -1,9 +1,6 @@
 package com.soosy.demo.Service;
 
-import java.util.List;
-
 import org.springframework.data.domain.Page;
-import org.springframework.http.HttpStatus;
 
 import com.soosy.demo.Entities.Director;
 import com.soosy.demo.Exceptions.DirectorNotFoundException;

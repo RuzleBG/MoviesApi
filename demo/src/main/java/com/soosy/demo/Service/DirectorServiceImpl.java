@@ -9,7 +9,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import com.soosy.demo.Entities.Director;
@@ -60,7 +59,7 @@ public class DirectorServiceImpl implements DirectorService {
     @Override
     public Page<String> getMoviesFromDirector(long directorId, int page, int size) throws DirectorNotFoundException {
         List<String> movieTitles= getDirectorById(directorId).getMovies().stream().map(x->x.getTitle()).collect(Collectors.toList());
-        return new PageImpl(movieTitles, PageRequest.of(page,size), movieTitles.size());
+        return new PageImpl<String>(movieTitles, PageRequest.of(page,size), movieTitles.size());
     }
 
     
