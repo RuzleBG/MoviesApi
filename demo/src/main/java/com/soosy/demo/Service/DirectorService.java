@@ -16,7 +16,7 @@ public interface DirectorService {
 
     Director saveDirector(@Valid Director director);
 
-    void assignDirector(long directorId, long movieId);
+    Director assignDirector(long directorId, long movieId);
 
     Page<String> getMoviesFromDirector(long directorId, int page, int size) throws DirectorNotFoundException;
     

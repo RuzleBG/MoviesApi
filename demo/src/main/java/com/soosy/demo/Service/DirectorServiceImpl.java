@@ -49,11 +49,12 @@ public class DirectorServiceImpl implements DirectorService {
     }
 
     @Override
-    public void assignDirector(long directorId, long movieId) throws DirectorNotFoundException, MovieNotFoundException {
+    public Director assignDirector(long directorId, long movieId) throws DirectorNotFoundException, MovieNotFoundException {
         Director director=getDirectorById(directorId);
         Movie movie=movieSerivce.findMovieById(movieId);
         movie.setDirector(director);
         movieSerivce.SaveMovie(movie);
+        return director;
     }
 
     @Override

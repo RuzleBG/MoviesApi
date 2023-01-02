@@ -60,7 +60,7 @@ public class MovieServiceImpl implements MovieSerivce{
 
     }
     @Override
-    public Page<String> getActors(int page, int size,   long id) throws MovieNotFoundException {
+    public Page<String> getActors(int page, int size, long id) throws MovieNotFoundException {
         List<String> actors=findMovieById(id).getActors().stream().map(x->x.getName()).collect(Collectors.toList());
         return new PageImpl<String>(actors, PageRequest.of(page, size), actors.size());
     }
